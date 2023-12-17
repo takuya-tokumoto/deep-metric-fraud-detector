@@ -9,13 +9,7 @@ RUN apt-get update -y && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install wrapt --upgrade --ignore-installed
-RUN pip install gym gym-minigrid pyopengl pylint natsort kfp seaborn polars
-RUN pip install transformers==4.24.0
-RUN pip install librosa
-RUN pip install numba==0.48 --ignore-installed
-RUN pip install git+https://github.com/h2oai/datatable
-RUN pip install fugashi==1.1.0 ipadic==1.0.0
+# pip install --upgrade jupyter_events jupyter_server_fileid
 
 # for jupyter lab tensorboard
 RUN npm install n -g \
@@ -26,23 +20,16 @@ RUN pip install tensorflow==2.4.0 jupyter-tensorboard==0.2.0 tensorflow-estimato
 # Tensorboardのextensionをjupyter3で動かす方法
 RUN pip install git+https://github.com/cliffwoolley/jupyter_tensorboard.git
 
-RUN pip install matplotlib
-RUN pip install lightgbm
-RUN conda install -y -c conda-forge torchmetrics pytorch-lightning
-RUN pip install torchaudio torchsummary
-
 # install code server
 RUN conda install jupyter-server-proxy -c conda-forge
 RUN pip install jupyter-vscode-proxy
 
-RUN pip install ipywidgets widgetsnbextension
-RUN pip install jupyterlab-lsp
-RUN pip install 'python-lsp-server[all]'
+RUN pip install ipywidgets widgetsnbextension jupyterlab-lsp 'python-lsp-server[all]'
 
 # install cudf
 RUN conda install -y -c rapidsai -c nvidia -c conda-forge cudf=22.12
 RUN conda install -y libgcc
-RUN conda update -y numpy
+# RUN conda update -y numpy
 
 RUN curl -fOL https://github.com/cdr/code-server/releases/download/v3.4.1/code-server_3.4.1_amd64.deb
 RUN dpkg -i code-server_3.4.1_amd64.deb
@@ -64,7 +51,15 @@ RUN cd /opt/install && \
    conda env update -n base --file environment.yml
 
 # パッケージの追加
-RUN pip install albumentations
+RUN pip install gym gym-minigrid pyopengl
+RUN pip install git+https://github.com/h2oai/datatable
+RUN conda install -y -c conda-forge torchmetrics pytorch-lightning
+RUN pip install torchaudio torchsummary
+RUN pip install --upgrade tensorflow
+RUN pip install cupy-cuda11x
+RUN pip install git+https://github.com/huggingface/transformers
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt --default-timeout=100
 
 # Since uid and gid will change at entrypoint, anything can be used
 ARG USER_ID=1000
